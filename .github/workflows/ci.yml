@@ -21,55 +21,55 @@ jobs:
       - run: npm run ci
       - run: npm run lint || true
 
-  # grype:
-  #   name: Grype
-  #   runs-on: ubuntu-latest
-  #   needs: 
-  #     - lint
-  #   steps:
-  #     - name: Checkout source code
-  #       uses: actions/checkout@v4
-  #     - name: Scan current project
-  #       uses: anchore/scan-action@v3
-  #       id: scan
-  #       with:
-  #         path: "."
-  #         fail-build: false
+  grype:
+    name: Grype
+    runs-on: ubuntu-latest
+    needs: 
+      - lint
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      - name: Scan current project
+        uses: anchore/scan-action@v3
+        id: scan
+        with:
+          path: "."
+          fail-build: false
 
-  # bearer:
-  #   name: Bearer
-  #   runs-on: ubuntu-latest
-  #   needs:
-  #     - lint
-  #   steps:
-  #     - name: Checkout source code
-  #       uses: actions/checkout@v4
-  #     - name: Run Report
-  #       id: report
-  #       uses: bearer/bearer-action@v2
-  #       with:
-  #         exit-code: 0
+  bearer:
+    name: Bearer
+    runs-on: ubuntu-latest
+    needs:
+      - lint
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      - name: Run Report
+        id: report
+        uses: bearer/bearer-action@v2
+        with:
+          exit-code: 0
 
-  # sonarcloud:
-  #   name: SonarCloud
-  #   runs-on: ubuntu-latest
-  #   needs: 
-  #     - grype
-  #     - bearer
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #     - name: SonarCloud Scan
-  #       uses: SonarSource/sonarcloud-github-action@master
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    needs: 
+      - grype
+      - bearer
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   tests:
     name: Tests
     runs-on: ubuntu-latest
-    # needs: 
-    #   - sonarcloud
+    needs: 
+      - sonarcloud
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
