@@ -33,6 +33,23 @@ jobs:
         webhook-url: ${{ secrets.WEBHOOK_URL }}
         content: "Deployment do app FAST-CI-CD:**${{ github.event.inputs.imageTag }}** disparado por **${{ github.actor }}** para o ambiente **${{ github.event.inputs.envronment }}**"
 
+    - name: 'Create env file'
+      run: |
+        touch .env
+        echo TEST_ENV_STRING="Meu secret via string" > .env
+        echo TEST_ENV_SECRET=${{ secrets.MY_SUPER_SECRET }} >> .env
+        cat .env
+
+    - name: copy file via ssh
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: "${{ env.HOST_ENV }}"
+        key: ${{ secrets.SSH_KEY }}
+        port: "${{ env.SSH_PORT }}"
+        username: "${{ env.SSH_USER }}"
+        source: ".env"
+        target: "/home/${{ env.SSH_USER }}/"
+
     - name: Deploy service
       uses: appleboy/ssh-action@v1.0.3
       with:
